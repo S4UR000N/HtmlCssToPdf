@@ -1,5 +1,6 @@
 const routes = require('./routes');
 const invoker = require('./invoker');
+const httpMethod = require('./http_methods');
 
 module.exports = (req, res) =>
 {
@@ -7,8 +8,11 @@ module.exports = (req, res) =>
     {
         if (req.url === route && req.method === routes[route].method)
         {
-            return invoker(routes[route].handler, res);
+            return req.method === httpMethod.GET
+            ? invoker(routes[route].handler, res)
+            : invoker(routes[route].handler, res, req)
+
         }
     }
     return invoker('404', res);
-};
+}

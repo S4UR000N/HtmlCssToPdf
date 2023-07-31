@@ -11,4 +11,4 @@ module.exports =
         method: httpMethod.POST,
         handler: 'convert'
     },
-};
+}
