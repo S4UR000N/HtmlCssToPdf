@@ -37,7 +37,7 @@ module.exports = (res, req) =>
                 await page.emulateMediaType('screen');
   
                 const pdf = await page.pdf({
-                  path: 'storage/' + uuid.v4() + '.pdf',
+                  path: 'src/storage/' + uuid.v4() + '.pdf',
                   margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
                   printBackground: true,
                   format: 'A4',
