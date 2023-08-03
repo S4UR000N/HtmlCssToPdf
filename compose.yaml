@@ -1,25 +1,25 @@
 services:
- dynamodb-local:
-   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-   image: "amazon/dynamodb-local:latest"
-   container_name: dynamodb-local
-   ports:
-     - "${AWS_PORT}:${AWS_PORT}"
-   volumes:
-     - "./docker/dynamodb:/home/dynamodblocal/data"
-   working_dir: /home/dynamodblocal
- app-node:
-   image: htmlcsstopdfimage:latest
-   container_name: app-node
-   ports:
-     - "${PROD_PORT}:${PROD_PORT}"
-   depends_on:
-     - "dynamodb-local"
-   links:
-     - "dynamodb-local"
-   environment:
-     HOST_NAME: $HOST_NAME
-     PROD_PORT: $PROD_PORT
-     AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-     AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-     REGION: $AWS_REGION
+  node:
+    build: .
+    image: htmlcsstopdfimage:latest
+    ports:
+      - "${PROD_PORT}:${PROD_PORT}"
+    depends_on:
+      - dynamodb
+    environment:
+      HOST_NAME: $HOST_NAME
+      PROD_PORT: $PROD_PORT
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
+      AWS_REGION: $AWS_REGION
+      AWS_PORT: $AWS_PORT
+
+  dynamodb:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    ports:
+      - "${AWS_PORT}:${AWS_PORT}"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal

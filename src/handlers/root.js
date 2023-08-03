@@ -3,6 +3,7 @@ const fs = require('node:fs');
 
 module.exports = res =>
 {
+    require('./../repository/BaseRepository');
     var filePath = path.join('public', 'templates', 'index.html');
     var stat = fs.statSync(filePath);
     res.statusCode = 200;
