@@ -1,6 +1,6 @@
 module.exports = async () =>
 {
-    await require("./DatabaseStartup")();
-
-    console.log("awaited truly");
+    const { dynamoClient, dynamoDocClient } = await require("./DatabaseStartup")();
+    
+    return { dynamoClient, dynamoDocClient };
 }
