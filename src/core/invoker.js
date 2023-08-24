@@ -1,1 +1,1 @@
-module.exports = (handler, res, req) => req === "undefined" ? require('./../handlers/'+handler)(res) : require('./../handlers/'+handler)(res, req);
+module.exports = async (handler, res, req) => req === "undefined" ? require('./../handlers/'+handler)(res) : require('./../handlers/'+handler)(res, req);

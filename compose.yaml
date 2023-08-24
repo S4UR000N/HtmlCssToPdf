@@ -1,11 +1,10 @@
 services:
   node:
+    container_name: node
     build: .
     image: htmlcsstopdfimage:latest
-    ports:
-      - "${PROD_PORT}:${PROD_PORT}"
-    depends_on:
-      - dynamodb
+    ports: ["${PROD_PORT}:${PROD_PORT}"]
+    depends_on: [localstack]
     environment:
       HOST_NAME: $HOST_NAME
       PROD_PORT: $PROD_PORT
@@ -15,11 +14,59 @@ services:
       AWS_REGION: $AWS_REGION
       AWS_PORT: $AWS_PORT
 
-  dynamodb:
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    ports:
-      - "${AWS_PORT}:${AWS_PORT}"
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest
+    ports: [4566:4566]
+      # - '4563-4599:4563-4599'
+      # - '8080:8080'            # Port for LocalStack web dashboard
+    environment:
+      - EDGE_PORT=4566
+      - BROWSING-TOPICS=1
+      - SERVICES=dynamodb, s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy 
+      - AWS_REGION=eu-north-1
     volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+  # dynamodb:
+  #   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+  #   image: "amazon/dynamodb-local:latest"
+  #   ports:
+  #     - "${AWS_PORT}:${AWS_PORT}"
+  #   volumes:
+  #     - "./docker/dynamodb:/home/dynamodblocal/data"
+  #   working_dir: /home/dynamodblocal
+
+  # admin:
+  #   image: localstack/localstack:latest
+  #   command: /usr/local/bin/localstack web
+  #   ports:
+  #     - "8081:8080"  # Port for LocalStack admin GUI
+  #   depends_on:
+  #     - localstack
+  #   environment:
+  #     - SERVICES=s3,dynamodb  # Emulate S3 and DynamoDB
+  #     - DEBUG=1
+  #     - DATA_DIR=/tmp/localstack/data
+  #     - AWS_ACCESS_KEY_ID=dummy
+  #     - AWS_SECRET_ACCESS_KEY=dummy 
+  #   volumes:
+  #     - './.localstack:/tmp/localstack'
+  #     - '/var/run/docker.sock:/var/run/docker.sock'
+  # admin:
+  #   image: amazon/dynamodb-local
+  #   ports:
+  #     - "0.0.0.0:${PROD_PORT}:${PROD_PORT}"
+  #   depends_on:
+  #     - localstack
+  #   environment:
+  #     AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  #     AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  #     AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
+  #     AWS_REGION: $AWS_REGION
+  #     AWS_PORT: $AWS_PORT

@@ -1,10 +1,8 @@
 const path = require('node:path');
 const fs = require('node:fs');
 
-module.exports = res =>
+module.exports = async res =>
 {
-    // require('./../repository/BaseRepository')();
-    require('./../repository/FilesRepository')();
     var filePath = path.join('public', 'templates', 'index.html');
     var stat = fs.statSync(filePath);
     res.statusCode = 200;

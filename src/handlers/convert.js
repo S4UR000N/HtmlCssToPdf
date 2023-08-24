@@ -4,8 +4,10 @@ const fs = require('fs');
 const uuid = require('uuid');
 
 
-module.exports = (res, req) =>
+module.exports = async (res, req) =>
 {
+  let FilesRepository = await (require('./../repository/FilesRepository')());
+
   // Parse POST form data
    let requestBody = '';
    req.on('data', (chunk) => requestBody += chunk.toString());
@@ -27,7 +29,8 @@ module.exports = (res, req) =>
           const result = await validator(options);
           if (result.isValid)
           {
-              (async () => {
+              let isSaved =
+              await (async () => {
                 const browser = await puppeteer.launch({
                     headless: true,
 	                  args: ['--no-sandbox']
@@ -36,19 +39,29 @@ module.exports = (res, req) =>
                 await page.setContent(htmlcss, { waitUntil: 'domcontentloaded' });
                 await page.emulateMediaType('screen');
   
-                const pdf = await page.pdf({
-                  path: 'src/storage/' + uuid.v4() + '.pdf',
+                const pdfFileBuffer = await page.pdf({
                   margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
                   printBackground: true,
                   format: 'A4',
                 });
 
                 await browser.close();
+
+                return FilesRepository.SavePdfFile(pdfFileBuffer);
               })();
 
-              res.statusCode = 200;
-              res.setHeader('Content-Type', 'text/html');
-              res.end('<a href="">undone</a>');
+              if (isSaved)
+              {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'text/html');
+                res.end('<a href="">undone</a>');
+              }
+              else
+              {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'text/html');
+                res.end('<h1>Failed to save the file, please try again.</h1>');
+              }
           }
 
           // Display HTML errors

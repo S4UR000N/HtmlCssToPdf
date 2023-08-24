@@ -1,4 +1,4 @@
-module.exports = res =>
+module.exports = async res =>
 {
     res.statusCode = 404;
     res.setHeader('Content-Type', 'text/html');

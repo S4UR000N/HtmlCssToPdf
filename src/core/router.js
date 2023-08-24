@@ -2,7 +2,7 @@ const routes = require('./routes');
 const invoker = require('./invoker');
 const httpMethod = require('./http_methods');
 
-module.exports = (req, res) =>
+module.exports = async (req, res) =>
 {
     for (route in routes)
     {

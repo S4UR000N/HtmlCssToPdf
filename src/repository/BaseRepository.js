@@ -1,6 +1,6 @@
 module.exports = async () =>
 {
-    const { dynamoClient, dynamoDocClient } = await require("./DatabaseStartup")();
+    const { dynamoClient, dynamoDocClient, s3Client } = await require("./DatabaseStartup")();
     
-    return { dynamoClient, dynamoDocClient };
+    return { dynamoClient, dynamoDocClient, s3Client };
 }
